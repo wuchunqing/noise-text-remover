@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Noise Text Remover — Clean Up Messy Text Instantly</title>
+  <meta name="description" content="Free online tool to remove noise characters, symbols, and junk from your text. Clean, simple, instant." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:     #2563eb;
+      --blue-lt:  #eff4ff;
+      --gray-50:  #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --radius:   14px;
+      --shadow:   0 2px 16px rgba(37,99,235,.09), 0 1px 3px rgba(0,0,0,.06);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-800);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    header {
+      background: #fff;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0 24px;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 28px; height: 28px;
+      background: var(--blue);
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .logo-icon svg { width: 15px; height: 15px; }
+
+    .logo-name { font-size: 15px; font-weight: 600; color: var(--gray-800); letter-spacing: -.01em; }
+
+    .logo-tag {
+      font-size: 11px;
+      background: var(--blue-lt);
+      color: var(--blue);
+      border-radius: 99px;
+      padding: 2px 8px;
+      font-weight: 500;
+      margin-left: 2px;
+    }
+
+    /* Main */
+    main {
+      flex: 1;
+      max-width: 980px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 16px 40px;
+    }
+
+    /* Intro */
+    .intro { text-align: center; margin-bottom: 28px; }
+
+    .intro h1 {
+      font-size: 26px; font-weight: 600;
+      color: var(--gray-800); margin-bottom: 8px; line-height: 1.3;
+    }
+
+    .intro p {
+      font-size: 14px; color: var(--gray-500);
+      max-width: 520px; margin: 0 auto; line-height: 1.6;
+    }
+
+    /* Options */
+    .options-bar {
+      display: flex; flex-wrap: wrap;
+      gap: 8px; align-items: center; margin-bottom: 14px;
+    }
+
+    .options-label {
+      font-size: 12px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .06em;
+      color: var(--gray-400); margin-right: 2px;
+    }
+
+    .opt-check {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 13px; color: var(--gray-700);
+      cursor: pointer; user-select: none;
+      padding: 4px 10px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 99px; background: #fff;
+      transition: border-color .2s, background .2s;
+    }
+
+    .opt-check input { display: none; }
+
+    .opt-check.active {
+      border-color: var(--blue);
+      background: var(--blue-lt);
+      color: var(--blue); font-weight: 500;
+    }
+
+    /* Editor grid */
+    .editor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px; margin-bottom: 16px;
+    }
+
+    @media (max-width: 640px) {
+      .editor-grid { grid-template-columns: 1fr; }
+      .intro h1 { font-size: 20px; }
+      .stats-row { flex-direction: column; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--gray-100); }
+      .stat-item:last-child { border-bottom: none; }
+    }
+
+    /* Pane */
+    .pane {
+      background: #fff; border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+
+    .pane-header {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px 10px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .pane-title {
+      font-size: 12px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .06em;
+      color: var(--gray-400);
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    .pane-title .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%; background: #cbd5e1;
+    }
+
+    .pane-title .dot.out { background: var(--blue); }
+
+    .char-count { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gray-400); }
+
+    textarea {
+      flex: 1; border: none; outline: none; resize: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px; line-height: 1.7;
+      color: var(--gray-800); padding: 14px 16px;
+      min-height: 260px; background: transparent;
+    }
+
+    textarea::placeholder { color: var(--gray-400); }
+    #outputText { background: var(--gray-50); color: var(--gray-700); }
+
+    /* Stats */
+    .stats-row {
+      background: #fff; border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: flex; flex-wrap: wrap;
+      margin-bottom: 16px; overflow: hidden;
+    }
+
+    .stat-item {
+      flex: 1; min-width: 100px;
+      padding: 14px 18px;
+      border-right: 1px solid var(--gray-100);
+      text-align: center;
+    }
+
+    .stat-item:last-child { border-right: none; }
+
+    .stat-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 20px; font-weight: 500;
+      color: var(--blue); display: block;
+    }
+
+    .stat-label {
+      font-size: 11px; color: var(--gray-400);
+      text-transform: uppercase; letter-spacing: .05em; margin-top: 2px;
+    }
+
+    /* Buttons */
+    .btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13.5px; font-weight: 600;
+      padding: 10px 18px; border-radius: 9px;
+      border: none; cursor: pointer;
+      transition: background .18s, transform .1s;
+      white-space: nowrap;
+    }
+
+    .btn:active { transform: scale(.97); }
+    .btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-primary:hover { background: #1d4ed8; }
+
+    .btn-outline {
+      background: #fff; color: var(--gray-700);
+      border: 1.5px solid var(--gray-200);
+    }
+    .btn-outline:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-lt); }
+
+    .btn-ghost { background: var(--gray-100); color: var(--gray-500); }
+    .btn-ghost:hover { background: var(--gray-200); color: var(--gray-700); }
+
+    /* How it works */
+    .how-card {
+      background: #fff; border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px; margin-top: 28px;
+    }
+
+    .how-card h2 { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-bottom: 14px; }
+
+    .how-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .how-item { display: flex; gap: 10px; align-items: flex-start; }
+
+    .how-num {
+      width: 22px; height: 22px;
+      background: var(--blue-lt); color: var(--blue);
+      border-radius: 50%; font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+
+    .how-text { font-size: 13px; color: var(--gray-500); line-height: 1.5; }
+    .how-text strong { color: var(--gray-700); display: block; font-size: 13px; }
+
+    /* Ad slot */
+    .ad-slot {
+      max-width: 980px; width: 100%;
+      margin: 20px auto 0; padding: 0 16px;
+    }
+
+    .ad-inner {
+      border: 1.5px dashed var(--gray-200);
+      border-radius: var(--radius);
+      min-height: 90px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--gray-400); font-size: 12px;
+      letter-spacing: .04em; text-transform: uppercase;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center; padding: 20px 16px;
+      font-size: 12px; color: var(--gray-400);
+      border-top: 1px solid var(--gray-200); margin-top: 28px;
+    }
+
+    footer a { color: var(--blue); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--gray-800); color: #fff;
+      font-size: 13px; padding: 9px 18px;
+      border-radius: 99px; opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s, transform .25s;
+      z-index: 999; white-space: nowrap;
+    }
+
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 6h18M3 12h18M3 18h18"/>
+        <line x1="17" y1="4" x2="21" y2="8"/><line x1="17" y1="8" x2="21" y2="4"/>
+      </svg>
+    </div>
+    <span class="logo-name">Noise Text Remover</span>
+    <span class="logo-tag">Free</span>
+  </header>
+
+  <main>
+
+    <!-- Intro -->
+    <div class="intro">
+      <h1>Remove Noise from Text Instantly</h1>
+      <p>Paste messy text on the left — junk symbols, encoding garbage, and invisible characters are stripped automatically. Clean readable text appears on the right in real time.</p>
+    </div>
+
+    <!-- Options -->
+    <div class="options-bar">
+      <span class="options-label">Remove:</span>
+      <label class="opt-check active" id="opt-symbols">
+        <input type="checkbox" checked> Special symbols
+      </label>
+      <label class="opt-check active" id="opt-extra-spaces">
+        <input type="checkbox" checked> Extra spaces
+      </label>
+      <label class="opt-check active" id="opt-zero-width">
+        <input type="checkbox" checked> Zero-width chars
+      </label>
+      <label class="opt-check active" id="opt-control">
+        <input type="checkbox" checked> Control chars
+      </label>
+      <label class="opt-check" id="opt-numbers">
+        <input type="checkbox"> Numbers too
+      </label>
+    </div>
+
+    <!-- Editor -->
+    <div class="editor-grid">
+      <div class="pane">
+        <div class="pane-header">
+          <span class="pane-title"><span class="dot"></span>Original Text</span>
+          <span class="char-count" id="inCount">0 chars</span>
+        </div>
+        <textarea id="inputText" placeholder="Paste your noisy text here&#10;&#10;e.g.  H&#8364;ll&#246; W0r!d &#8203;&#65279;&#65533;&#65533; foo@#$bar"></textarea>
+      </div>
+      <div class="pane">
+        <div class="pane-header">
+          <span class="pane-title"><span class="dot out"></span>Cleaned Text</span>
+          <span class="char-count" id="outCount">0 chars</span>
+        </div>
+        <textarea id="outputText" readonly placeholder="Cleaned result will appear here..."></textarea>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-item">
+        <span class="stat-num" id="statIn">0</span>
+        <span class="stat-label">Input chars</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" id="statOut">0</span>
+        <span class="stat-label">Output chars</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" id="statRemoved">0</span>
+        <span class="stat-label">Removed</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" id="statPct">-</span>
+        <span class="stat-label">Noise ratio</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" id="statWords">0</span>
+        <span class="stat-label">Words out</span>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btnClean">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        </svg>
+        Clean Text
+      </button>
+      <button class="btn btn-outline" id="btnCopy">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        Copy Result
+      </button>
+      <button class="btn btn-outline" id="btnDownload">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download .txt
+      </button>
+      <button class="btn btn-ghost" id="btnClear">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+        </svg>
+        Clear All
+      </button>
+    </div>
+
+    <!-- How it works -->
+    <div class="how-card">
+      <h2>How It Works</h2>
+      <div class="how-list">
+        <div class="how-item">
+          <div class="how-num">1</div>
+          <div class="how-text"><strong>Paste noisy text</strong>Any text with junk symbols, encoding errors, or invisible characters.</div>
+        </div>
+        <div class="how-item">
+          <div class="how-num">2</div>
+          <div class="how-text"><strong>Choose what to strip</strong>Toggle symbols, extra spaces, zero-width chars, or control characters.</div>
+        </div>
+        <div class="how-item">
+          <div class="how-num">3</div>
+          <div class="how-text"><strong>Preview in real time</strong>The right panel updates instantly. Stats show exactly how much noise was removed.</div>
+        </div>
+        <div class="how-item">
+          <div class="how-num">4</div>
+          <div class="how-text"><strong>Export your text</strong>Copy to clipboard or download as a .txt file — ready to use anywhere.</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Ad slot -->
+  <div class="ad-slot">
+    <div class="ad-inner">Advertisement — 728 x 90</div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    &copy;2025 <a href="#">Noise Text Remover</a> &mdash; All rights reserved.
+    &nbsp;&middot;&nbsp; No data is stored or sent to any server. Everything runs in your browser.
+  </footer>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    /* ── Element refs ── */
+    const inputText   = document.getElementById('inputText');
+    const outputText  = document.getElementById('outputText');
+    const inCount     = document.getElementById('inCount');
+    const outCount    = document.getElementById('outCount');
+    const statIn      = document.getElementById('statIn');
+    const statOut     = document.getElementById('statOut');
+    const statRemoved = document.getElementById('statRemoved');
+    const statPct     = document.getElementById('statPct');
+    const statWords   = document.getElementById('statWords');
+    const toast       = document.getElementById('toast');
+
+    /* ── Option toggles ── */
+    const optEls = {
+      symbols:     document.getElementById('opt-symbols'),
+      extraSpaces: document.getElementById('opt-extra-spaces'),
+      zeroWidth:   document.getElementById('opt-zero-width'),
+      control:     document.getElementById('opt-control'),
+      numbers:     document.getElementById('opt-numbers'),
+    };
+
+    /* Toggle pill style on click (click fires before checkbox change, so flip manually) */
+    Object.values(optEls).forEach(el => {
+      el.addEventListener('click', () => {
+        const cb = el.querySelector('input');
+        cb.checked = !cb.checked;
+        el.classList.toggle('active', cb.checked);
+        clean();
+      });
+    });
+
+    function getOpts() {
+      return Object.fromEntries(
+        Object.entries(optEls).map(([k, el]) => [k, el.querySelector('input').checked])
+      );
+    }
+
+    /* ── Core cleaning function ── */
+    function cleanText(text, opts) {
+      let out = text;
+
+      /* 1. Zero-width & invisible Unicode (zero-width space, BOM, soft-hyphen, etc.) */
+      if (opts.zeroWidth) {
+        out = out.replace(/[\u200B-\u200D\uFEFF\u00AD\u2060\u180E\u034F\uFFA0]/g, '');
+      }
+
+      /* 2. Control characters (keep \n newline and \t tab) */
+      if (opts.control) {
+        out = out.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, '');
+        /* Unicode replacement / block-element junk common in encoding errors */
+        out = out.replace(/[\uFFFD\u2588-\u2595]/g, '');
+      }
+
+      /* 3. Special symbols — keep letters, digits (unless stripped), basic punctuation, whitespace */
+      if (opts.symbols) {
+        const keep = opts.numbers
+          ? /[^a-zA-Z\s.,!?;:'"()\-]/g
+          : /[^a-zA-Z0-9\s.,!?;:'"()\-]/g;
+        out = out.replace(keep, '');
+      } else if (opts.numbers) {
+        out = out.replace(/\d/g, '');
+      }
+
+      /* 4. Normalize whitespace: trim lines, collapse multiple spaces, limit blank lines */
+      if (opts.extraSpaces) {
+        out = out
+          .split('\n')
+          .map(line => line.replace(/[ \t]{2,}/g, ' ').trim())
+          .join('\n')
+          .replace(/\n{3,}/g, '\n\n')
+          .trim();
+      }
+
+      return out;
+    }
+
+    /* ── Update stat counters ── */
+    function updateStats(raw, cleaned) {
+      const inLen   = raw.length;
+      const outLen  = cleaned.length;
+      const removed = Math.max(0, inLen - outLen);
+      const pct     = inLen > 0 ? Math.round((removed / inLen) * 100) : null;
+      const words   = cleaned.trim() === '' ? 0 : cleaned.trim().split(/\s+/).length;
+
+      statIn.textContent      = inLen.toLocaleString();
+      statOut.textContent     = outLen.toLocaleString();
+      statRemoved.textContent = removed.toLocaleString();
+      statPct.textContent     = pct !== null ? pct + '%' : '-';
+      statWords.textContent   = words.toLocaleString();
+      inCount.textContent     = inLen  + ' chars';
+      outCount.textContent    = outLen + ' chars';
+    }
+
+    /* ── Run clean ── */
+    function clean() {
+      const raw     = inputText.value;
+      const result  = cleanText(raw, getOpts());
+      outputText.value = result;
+      updateStats(raw, result);
+    }
+
+    /* ── Toast helper ── */
+    let toastTimer;
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    /* ── Button: Clean (manual) ── */
+    document.getElementById('btnClean').addEventListener('click', () => {
+      clean();
+      showToast('Text cleaned!');
+    });
+
+    /* ── Button: Copy result ── */
+    document.getElementById('btnCopy').addEventListener('click', () => {
+      if (!outputText.value) { showToast('Nothing to copy yet.'); return; }
+      navigator.clipboard.writeText(outputText.value)
+        .then(() => showToast('Copied to clipboard!'))
+        .catch(() => {
+          outputText.select();
+          document.execCommand('copy');
+          showToast('Copied!');
+        });
+    });
+
+    /* ── Button: Download .txt ── */
+    document.getElementById('btnDownload').addEventListener('click', () => {
+      if (!outputText.value) { showToast('Nothing to download yet.'); return; }
+      const blob = new Blob([outputText.value], { type: 'text/plain;charset=utf-8' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url; a.download = 'cleaned-text.txt';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('File downloaded!');
+    });
+
+    /* ── Button: Clear all ── */
+    document.getElementById('btnClear').addEventListener('click', () => {
+      inputText.value = ''; outputText.value = '';
+      updateStats('', '');
+      showToast('Cleared.');
+      inputText.focus();
+    });
+
+    /* ── Real-time: clean on every keystroke ── */
+    inputText.addEventListener('input', clean);
+
+    /* Init */
+    updateStats('', '');
+  </script>
+</body>
+</html>
