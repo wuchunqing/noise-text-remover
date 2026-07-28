@@ -1,610 +1,604 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Noise Text Remover — Clean Up Messy Text Instantly</title>
-  <meta name="description" content="Free online tool to remove noise characters, symbols, and junk from your text. Clean, simple, instant." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400&display=swap" rel="stylesheet" />
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text Line Remover — Blank Lines, Duplicates &amp; Cleanup Online</title>
+  <meta name="description" content="Free text line remover online. Delete blank lines, remove duplicates, trim spaces, filter by keyword/regex, sort or join lines — private, in-browser. Inspired by Line Cleanup, WebTextTools &amp; duplicate-line removers.">
+  <meta name="google-site-verification" content="uz_j2c_UOuyTXyW6W87egnN8gHCyfSqm3kyY_XEx62w" />
+  <meta name="theme-color" content="#C2410C">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --blue:     #2563eb;
-      --blue-lt:  #eff4ff;
-      --gray-50:  #f8fafc;
-      --gray-100: #f1f5f9;
-      --gray-200: #e2e8f0;
-      --gray-400: #94a3b8;
-      --gray-500: #64748b;
-      --gray-700: #334155;
-      --gray-800: #1e293b;
-      --radius:   14px;
-      --shadow:   0 2px 16px rgba(37,99,235,.09), 0 1px 3px rgba(0,0,0,.06);
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --primary:#C2410C;--primary-dark:#9A3412;--primary-light:#FFEDD5;
+      --accent:#F97316;--ink:#7C2D12;--muted:#64748B;--line:#E2E8F0;
+      --bg:#FFF7ED;--card:#fff;--radius:16px;
+      --shadow:0 8px 32px rgba(194,65,12,.08);
+      --ok:#059669;
     }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--gray-50);
-      color: var(--gray-800);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+    body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:#1E293B;line-height:1.65;font-size:15px}
+    .container{max-width:1080px;margin:0 auto;padding:0 20px}
+    header{background:#fff;border-bottom:1px solid var(--line);padding:16px 0;position:sticky;top:0;z-index:10}
+    .logo{font-size:20px;font-weight:800;color:var(--primary);text-decoration:none}
+    .hero{padding:36px 0 22px;text-align:center;background:linear-gradient(165deg,#FFEDD5,#FED7AA 50%,#FFF7ED)}
+    .hero-badge{display:inline-block;background:var(--primary-light);color:var(--primary-dark);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:6px 14px;border-radius:999px;margin-bottom:12px}
+    .hero h1{font-size:clamp(26px,4vw,38px);font-weight:800;color:var(--ink);margin-bottom:8px;letter-spacing:-.02em}
+    .hero p{max-width:720px;margin:0 auto;color:var(--muted);font-size:15px}
+    .metrics{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:16px}
+    .metric-pill{padding:8px 14px;background:#fff;border:1px solid var(--line);border-radius:999px;font-size:12px;font-weight:700;color:var(--ink)}
+    .metric-pill span{color:var(--primary)}
+    .layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px;align-items:start;margin:28px 0}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:28px;display:flex;flex-direction:column;gap:14px;position:relative;z-index:5}
+    .card h2{font-size:18px;font-weight:800;color:var(--ink);margin:0}
+    .card .sub{font-size:13px;color:var(--muted);margin:0}
+    .sec-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--primary-dark);margin:2px 0 0}
+    .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .stat{background:#F8FAFC;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+    .stat .k{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+    .stat .v{font-size:20px;font-weight:900;color:var(--primary-dark);font-variant-numeric:tabular-nums}
+    .stat.accent{background:linear-gradient(145deg,#F97316,#C2410C);border:none;color:#fff}
+    .stat.accent .k{color:rgba(255,255,255,.85)}
+    .stat.accent .v{color:#fff}
+    .editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .editor-col label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:6px}
+    .editor{width:100%;min-height:260px;padding:14px;border:1.5px solid var(--line);border-radius:14px;font:inherit;font-size:14px;line-height:1.55;resize:vertical;background:#fff;color:#0F172A}
+    .editor:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(194,65,12,.12)}
+    .editor.out{background:#FFFBEB}
+    .checks{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px}
+    .check{display:flex;align-items:flex-start;gap:8px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;line-height:1.4}
+    .check input{width:16px;height:16px;margin-top:2px;flex-shrink:0;accent-color:var(--primary)}
+    .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .field label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:5px}
+    .input,.select{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:11px;font:inherit;font-size:14px;font-weight:600;background:#fff}
+    .input:focus,.select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(194,65,12,.12)}
+    .hint{font-size:12px;color:var(--muted);padding:11px 12px;background:#F8FAFC;border-radius:10px;border-left:3px solid var(--accent);margin:0}
+    .btn-row{display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:5}
+    .btn-main,.btn-ghost{
+      position:relative;z-index:6;cursor:pointer;touch-action:manipulation;
+      -webkit-appearance:none;appearance:none;pointer-events:auto;
     }
-
-    /* Header */
-    header {
-      background: #fff;
-      border-bottom: 1px solid var(--gray-200);
-      padding: 0 24px;
-      height: 58px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    .btn-main{flex:1;min-width:120px;padding:14px 18px;background:linear-gradient(135deg,#F97316,#C2410C);color:#fff;border:none;border-radius:11px;font:inherit;font-size:15px;font-weight:800}
+    .btn-ghost{padding:14px 18px;border:1.5px solid var(--line);border-radius:11px;background:#fff;font:inherit;font-size:14px;font-weight:700;color:var(--muted)}
+    .live-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--primary-dark)}
+    .live-tag i{width:8px;height:8px;border-radius:50%;background:var(--ok);display:inline-block}
+    .tip-box,.note-box{padding:12px;border-radius:10px;font-size:12px;line-height:1.6;margin:0}
+    .tip-box{background:var(--primary-light);border:1px solid #FDBA74;color:var(--primary-dark)}
+    .note-box{background:#FFFBEB;border:1px solid #FDE68A;color:#92400E}
+    .sidebar{display:flex;flex-direction:column;gap:14px}
+    .sidebar-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+    .sidebar-card h3{font-size:14px;font-weight:800;margin-bottom:10px}
+    .ref-table{width:100%;font-size:12px;border-collapse:collapse}
+    .ref-table td{padding:6px 0;border-bottom:1px dashed var(--line)}
+    .ref-table td:last-child{text-align:right;font-weight:700}
+    .sidebar-list{list-style:none;font-size:12px;color:var(--muted);line-height:1.9}
+    .guide-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:28px 0}
+    .guide-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+    .guide-card h2{font-size:16px;font-weight:800;margin-bottom:8px}
+    .guide-card p,.guide-card li{font-size:14px;color:var(--muted)}
+    .guide-card ul{padding-left:18px;margin-top:6px}
+    .steps{display:grid;gap:10px;margin-top:10px}
+    .step{display:flex;gap:12px;padding:12px;background:#F8FAFC;border:1px solid var(--line);border-radius:12px;font-size:13px;color:var(--muted)}
+    .step b{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--primary);color:#fff;font-size:12px;flex-shrink:0}
+    .content-block{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin:0 0 20px}
+    .content-block h2{font-size:17px;font-weight:800;color:var(--ink);margin-bottom:8px}
+    .content-block p,.content-block li{font-size:14px;color:var(--muted)}
+    .content-block ul{padding-left:18px;margin-top:8px}
+    .content-block li{margin-bottom:4px}
+    details{background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:8px}
+    details[open]{border-color:var(--primary)}
+    summary{padding:13px 16px;font-weight:700;cursor:pointer;list-style:none;font-size:14px}
+    summary::-webkit-details-marker{display:none}
+    details p{padding:0 16px 14px;font-size:13px;color:var(--muted);line-height:1.65}
+    footer{text-align:center;padding:24px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);background:#fff;margin-top:20px}
+    .ad-top,.ad-sidebar,.ad-bottom,.ad-mid{display:flex;justify-content:center;align-items:center;margin:16px auto;overflow:hidden;min-height:50px;background:transparent;position:relative;z-index:0}
+    .ad-top{width:100%;max-width:728px;min-height:90px}
+    .ad-mid{width:100%;max-width:728px;min-height:90px;margin:8px auto 24px}
+    .ad-sidebar{width:100%;max-width:300px;min-height:250px;border-radius:var(--radius)}
+    .ad-bottom{width:100%;max-width:320px;min-height:50px}
+    .sec-title{font-size:18px;font-weight:800;margin-bottom:12px;color:var(--ink)}
+    .more-tools{margin:28px 0 8px;padding:20px;background:#fff;border:1px solid var(--line);border-radius:16px}
+    .more-tools h2{font-size:15px;font-weight:800;color:var(--ink);margin-bottom:12px}
+    .more-tools .links{display:flex;flex-wrap:wrap;gap:8px}
+    .more-tools a{font-size:12px;font-weight:700;color:var(--primary-dark);text-decoration:none;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:#fff}
+    .more-tools a:hover{border-color:var(--primary);background:var(--primary-light)}
+    .status{display:none;padding:11px 12px;border-radius:10px;font-size:13px;font-weight:600}
+    .status.show{display:block}
+    .status.ok{background:#ECFDF5;border:1px solid #A7F3D0;color:#065F46}
+    .status.err{background:#FEF2F2;border:1px solid #FECACA;color:#991B1B}
+    .status.info{background:var(--primary-light);border:1px solid #FDBA74;color:var(--primary-dark)}
+    @media(max-width:860px){
+      .layout,.editor-grid,.guide-grid,.checks,.form-grid{grid-template-columns:1fr}
+      .stat-grid{grid-template-columns:repeat(2,1fr)}
     }
-
-    .logo-icon {
-      width: 28px; height: 28px;
-      background: var(--blue);
-      border-radius: 7px;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .logo-icon svg { width: 15px; height: 15px; }
-
-    .logo-name { font-size: 15px; font-weight: 600; color: var(--gray-800); letter-spacing: -.01em; }
-
-    .logo-tag {
-      font-size: 11px;
-      background: var(--blue-lt);
-      color: var(--blue);
-      border-radius: 99px;
-      padding: 2px 8px;
-      font-weight: 500;
-      margin-left: 2px;
-    }
-
-    /* Main */
-    main {
-      flex: 1;
-      max-width: 980px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 32px 16px 40px;
-    }
-
-    /* Intro */
-    .intro { text-align: center; margin-bottom: 28px; }
-
-    .intro h1 {
-      font-size: 26px; font-weight: 600;
-      color: var(--gray-800); margin-bottom: 8px; line-height: 1.3;
-    }
-
-    .intro p {
-      font-size: 14px; color: var(--gray-500);
-      max-width: 520px; margin: 0 auto; line-height: 1.6;
-    }
-
-    /* Options */
-    .options-bar {
-      display: flex; flex-wrap: wrap;
-      gap: 8px; align-items: center; margin-bottom: 14px;
-    }
-
-    .options-label {
-      font-size: 12px; font-weight: 600;
-      text-transform: uppercase; letter-spacing: .06em;
-      color: var(--gray-400); margin-right: 2px;
-    }
-
-    .opt-check {
-      display: flex; align-items: center; gap: 5px;
-      font-size: 13px; color: var(--gray-700);
-      cursor: pointer; user-select: none;
-      padding: 4px 10px;
-      border: 1.5px solid var(--gray-200);
-      border-radius: 99px; background: #fff;
-      transition: border-color .2s, background .2s;
-    }
-
-    .opt-check input { display: none; }
-
-    .opt-check.active {
-      border-color: var(--blue);
-      background: var(--blue-lt);
-      color: var(--blue); font-weight: 500;
-    }
-
-    /* Editor grid */
-    .editor-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px; margin-bottom: 16px;
-    }
-
-    @media (max-width: 640px) {
-      .editor-grid { grid-template-columns: 1fr; }
-      .intro h1 { font-size: 20px; }
-      .stats-row { flex-direction: column; }
-      .stat-item { border-right: none; border-bottom: 1px solid var(--gray-100); }
-      .stat-item:last-child { border-bottom: none; }
-    }
-
-    /* Pane */
-    .pane {
-      background: #fff; border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      display: flex; flex-direction: column; overflow: hidden;
-    }
-
-    .pane-header {
-      display: flex; align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px 10px;
-      border-bottom: 1px solid var(--gray-100);
-    }
-
-    .pane-title {
-      font-size: 12px; font-weight: 600;
-      text-transform: uppercase; letter-spacing: .06em;
-      color: var(--gray-400);
-      display: flex; align-items: center; gap: 6px;
-    }
-
-    .pane-title .dot {
-      width: 7px; height: 7px;
-      border-radius: 50%; background: #cbd5e1;
-    }
-
-    .pane-title .dot.out { background: var(--blue); }
-
-    .char-count { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gray-400); }
-
-    textarea {
-      flex: 1; border: none; outline: none; resize: none;
-      font-family: 'DM Mono', monospace;
-      font-size: 13px; line-height: 1.7;
-      color: var(--gray-800); padding: 14px 16px;
-      min-height: 260px; background: transparent;
-    }
-
-    textarea::placeholder { color: var(--gray-400); }
-    #outputText { background: var(--gray-50); color: var(--gray-700); }
-
-    /* Stats */
-    .stats-row {
-      background: #fff; border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      display: flex; flex-wrap: wrap;
-      margin-bottom: 16px; overflow: hidden;
-    }
-
-    .stat-item {
-      flex: 1; min-width: 100px;
-      padding: 14px 18px;
-      border-right: 1px solid var(--gray-100);
-      text-align: center;
-    }
-
-    .stat-item:last-child { border-right: none; }
-
-    .stat-num {
-      font-family: 'DM Mono', monospace;
-      font-size: 20px; font-weight: 500;
-      color: var(--blue); display: block;
-    }
-
-    .stat-label {
-      font-size: 11px; color: var(--gray-400);
-      text-transform: uppercase; letter-spacing: .05em; margin-top: 2px;
-    }
-
-    /* Buttons */
-    .btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
-
-    .btn {
-      display: inline-flex; align-items: center; gap: 7px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13.5px; font-weight: 600;
-      padding: 10px 18px; border-radius: 9px;
-      border: none; cursor: pointer;
-      transition: background .18s, transform .1s;
-      white-space: nowrap;
-    }
-
-    .btn:active { transform: scale(.97); }
-    .btn svg { width: 15px; height: 15px; flex-shrink: 0; }
-
-    .btn-primary { background: var(--blue); color: #fff; }
-    .btn-primary:hover { background: #1d4ed8; }
-
-    .btn-outline {
-      background: #fff; color: var(--gray-700);
-      border: 1.5px solid var(--gray-200);
-    }
-    .btn-outline:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-lt); }
-
-    .btn-ghost { background: var(--gray-100); color: var(--gray-500); }
-    .btn-ghost:hover { background: var(--gray-200); color: var(--gray-700); }
-
-    /* How it works */
-    .how-card {
-      background: #fff; border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 24px; margin-top: 28px;
-    }
-
-    .how-card h2 { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-bottom: 14px; }
-
-    .how-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 12px;
-    }
-
-    .how-item { display: flex; gap: 10px; align-items: flex-start; }
-
-    .how-num {
-      width: 22px; height: 22px;
-      background: var(--blue-lt); color: var(--blue);
-      border-radius: 50%; font-size: 11px; font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; margin-top: 1px;
-    }
-
-    .how-text { font-size: 13px; color: var(--gray-500); line-height: 1.5; }
-    .how-text strong { color: var(--gray-700); display: block; font-size: 13px; }
-
-    /* Ad slot */
-    .ad-slot {
-      max-width: 980px; width: 100%;
-      margin: 20px auto 0; padding: 0 16px;
-    }
-
-    .ad-inner {
-      border: 1.5px dashed var(--gray-200);
-      border-radius: var(--radius);
-      min-height: 90px;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--gray-400); font-size: 12px;
-      letter-spacing: .04em; text-transform: uppercase;
-    }
-
-    /* Footer */
-    footer {
-      text-align: center; padding: 20px 16px;
-      font-size: 12px; color: var(--gray-400);
-      border-top: 1px solid var(--gray-200); margin-top: 28px;
-    }
-
-    footer a { color: var(--blue); text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
-
-    /* Toast */
-    .toast {
-      position: fixed; bottom: 28px; left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: var(--gray-800); color: #fff;
-      font-size: 13px; padding: 9px 18px;
-      border-radius: 99px; opacity: 0;
-      pointer-events: none;
-      transition: opacity .25s, transform .25s;
-      z-index: 999; white-space: nowrap;
-    }
-
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </head>
-
 <body>
 
-  <!-- Header -->
-  <header>
-    <div class="logo-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 6h18M3 12h18M3 18h18"/>
-        <line x1="17" y1="4" x2="21" y2="8"/><line x1="17" y1="8" x2="21" y2="4"/>
-      </svg>
+<header>
+  <div class="container"><a href="../" class="logo">Text Line Remover</a></div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <span class="hero-badge">Blank · Duplicates · Filter · Sort · Private</span>
+    <h1>Text Line Remover</h1>
+    <p>Clean messy lists in your browser — remove blank lines, strip duplicates, trim spaces, filter by keyword or regex, then sort or join. Inspired by Line Cleanup, WebTextTools &amp; popular duplicate-line removers. Nothing is uploaded.</p>
+    <div class="metrics">
+      <div class="metric-pill"><span>Live</span> as you type</div>
+      <div class="metric-pill"><span>Deduplicate</span> keep first / last</div>
+      <div class="metric-pill"><span>Private</span> on-device</div>
     </div>
-    <span class="logo-name">Noise Text Remover</span>
-    <span class="logo-tag">Free</span>
-  </header>
+  </div>
+</section>
 
-  <main>
+<div class="container">
+  <div class="ad-top">
+    <script>atOptions={'key':'b31a21d357a574f5abfe948e08497cc3','format':'iframe','height':90,'width':728,'params':{}};</script>
+    <script src="https://www.highperformanceformat.com/b31a21d357a574f5abfe948e08497cc3/invoke.js"></script>
+    <!-- 顶部广告脚本（加了属性） -->
+    <script data-cfasync="false" src="https://adsterra-xxx1.js"></script>
+  </div>
+</div>
 
-    <!-- Intro -->
-    <div class="intro">
-      <h1>Remove Noise from Text Instantly</h1>
-      <p>Paste messy text on the left — junk symbols, encoding garbage, and invisible characters are stripped automatically. Clean readable text appears on the right in real time.</p>
-    </div>
+<div class="container">
+  <div class="layout">
+    <main class="card">
+      <h2>Clean your lines</h2>
+      <p class="sub">Paste a list, log, keyword export, or notes. Toggle the rules you need — output updates live.</p>
 
-    <!-- Options -->
-    <div class="options-bar">
-      <span class="options-label">Remove:</span>
-      <label class="opt-check active" id="opt-symbols">
-        <input type="checkbox" checked> Special symbols
-      </label>
-      <label class="opt-check active" id="opt-extra-spaces">
-        <input type="checkbox" checked> Extra spaces
-      </label>
-      <label class="opt-check active" id="opt-zero-width">
-        <input type="checkbox" checked> Zero-width chars
-      </label>
-      <label class="opt-check active" id="opt-control">
-        <input type="checkbox" checked> Control chars
-      </label>
-      <label class="opt-check" id="opt-numbers">
-        <input type="checkbox"> Numbers too
-      </label>
-    </div>
+      <div class="live-tag"><i></i> Live cleanup</div>
+      <div class="stat-grid">
+        <div class="stat"><div class="k">Input lines</div><div class="v" id="sIn">0</div></div>
+        <div class="stat accent"><div class="k">Output lines</div><div class="v" id="sOut">0</div></div>
+        <div class="stat"><div class="k">Removed</div><div class="v" id="sRem">0</div></div>
+        <div class="stat"><div class="k">Chars out</div><div class="v" id="sChars">0</div></div>
+      </div>
 
-    <!-- Editor -->
-    <div class="editor-grid">
-      <div class="pane">
-        <div class="pane-header">
-          <span class="pane-title"><span class="dot"></span>Original Text</span>
-          <span class="char-count" id="inCount">0 chars</span>
+      <div class="editor-grid">
+        <div class="editor-col">
+          <label for="inputText">Input</label>
+          <textarea class="editor" id="inputText" placeholder="Paste lines here…&#10;apple&#10;banana&#10;&#10;apple&#10;  banana  "></textarea>
         </div>
-        <textarea id="inputText" placeholder="Paste your noisy text here&#10;&#10;e.g.  H&#8364;ll&#246; W0r!d &#8203;&#65279;&#65533;&#65533; foo@#$bar"></textarea>
-      </div>
-      <div class="pane">
-        <div class="pane-header">
-          <span class="pane-title"><span class="dot out"></span>Cleaned Text</span>
-          <span class="char-count" id="outCount">0 chars</span>
-        </div>
-        <textarea id="outputText" readonly placeholder="Cleaned result will appear here..."></textarea>
-      </div>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats-row">
-      <div class="stat-item">
-        <span class="stat-num" id="statIn">0</span>
-        <span class="stat-label">Input chars</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-num" id="statOut">0</span>
-        <span class="stat-label">Output chars</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-num" id="statRemoved">0</span>
-        <span class="stat-label">Removed</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-num" id="statPct">-</span>
-        <span class="stat-label">Noise ratio</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-num" id="statWords">0</span>
-        <span class="stat-label">Words out</span>
-      </div>
-    </div>
-
-    <!-- Buttons -->
-    <div class="btn-row">
-      <button class="btn btn-primary" id="btnClean">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
-        </svg>
-        Clean Text
-      </button>
-      <button class="btn btn-outline" id="btnCopy">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-        </svg>
-        Copy Result
-      </button>
-      <button class="btn btn-outline" id="btnDownload">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
-        Download .txt
-      </button>
-      <button class="btn btn-ghost" id="btnClear">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-        </svg>
-        Clear All
-      </button>
-    </div>
-
-    <!-- How it works -->
-    <div class="how-card">
-      <h2>How It Works</h2>
-      <div class="how-list">
-        <div class="how-item">
-          <div class="how-num">1</div>
-          <div class="how-text"><strong>Paste noisy text</strong>Any text with junk symbols, encoding errors, or invisible characters.</div>
-        </div>
-        <div class="how-item">
-          <div class="how-num">2</div>
-          <div class="how-text"><strong>Choose what to strip</strong>Toggle symbols, extra spaces, zero-width chars, or control characters.</div>
-        </div>
-        <div class="how-item">
-          <div class="how-num">3</div>
-          <div class="how-text"><strong>Preview in real time</strong>The right panel updates instantly. Stats show exactly how much noise was removed.</div>
-        </div>
-        <div class="how-item">
-          <div class="how-num">4</div>
-          <div class="how-text"><strong>Export your text</strong>Copy to clipboard or download as a .txt file — ready to use anywhere.</div>
+        <div class="editor-col">
+          <label for="outputText">Output</label>
+          <textarea class="editor out" id="outputText" readonly placeholder="Cleaned text appears here…"></textarea>
         </div>
       </div>
-    </div>
 
-  </main>
+      <div class="sec-label">Cleanup rules</div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" id="optBlank" checked> Remove blank / whitespace-only lines</label>
+        <label class="check"><input type="checkbox" id="optDup" checked> Remove duplicate lines</label>
+        <label class="check"><input type="checkbox" id="optTrim"> Trim each line (leading / trailing spaces)</label>
+        <label class="check"><input type="checkbox" id="optSpaces"> Collapse multiple spaces inside lines</label>
+        <label class="check"><input type="checkbox" id="optIgnoreCase"> Ignore case when comparing duplicates</label>
+        <label class="check"><input type="checkbox" id="optTrimCmp" checked> Trim before duplicate comparison</label>
+        <label class="check"><input type="checkbox" id="optKeepLast"> Keep last occurrence (not first)</label>
+        <label class="check"><input type="checkbox" id="optJoin"> Join remaining lines with a separator</label>
+      </div>
 
-  <!-- Ad slot -->
-  <div class="ad-slot">
-    <div class="ad-inner">Advertisement — 728 x 90</div>
+      <div class="form-grid">
+        <div class="field">
+          <label for="optSort">Sort output</label>
+          <select class="select" id="optSort">
+            <option value="none">Keep original order</option>
+            <option value="asc">A → Z</option>
+            <option value="desc">Z → A</option>
+            <option value="len-asc">Shortest → longest</option>
+            <option value="len-desc">Longest → shortest</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="optSep">Join separator</label>
+          <select class="select" id="optSep">
+            <option value=", ">Comma + space</option>
+            <option value=",">Comma</option>
+            <option value="|">Pipe</option>
+            <option value="\t">Tab</option>
+            <option value="; ">Semicolon</option>
+            <option value=" ">Space</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sec-label">Remove lines that match</div>
+      <div class="form-grid">
+        <div class="field">
+          <label for="filterMode">Filter mode</label>
+          <select class="select" id="filterMode">
+            <option value="off">Off</option>
+            <option value="contains">Contains text</option>
+            <option value="starts">Starts with</option>
+            <option value="ends">Ends with</option>
+            <option value="exact">Exact match</option>
+            <option value="regex">Regular expression</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="filterVal">Match text / pattern</label>
+          <input class="input" id="filterVal" placeholder="e.g. TODO or ^#">
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" id="filterInvert"> Invert filter (keep only matching lines)</label>
+
+      <p class="hint">Duplicate comparison can ignore case and trim spaces (like WebTextTools), while optional “Trim each line” rewrites the output itself. Filter runs after blank/duplicate cleanup.</p>
+
+      <div class="btn-row">
+        <button type="button" class="btn-main" id="btnRun">Clean lines</button>
+        <button type="button" class="btn-ghost" id="btnCopy">Copy output</button>
+        <button type="button" class="btn-ghost" id="btnDownload">Download .txt</button>
+        <button type="button" class="btn-ghost" id="btnSwap">Use output as input</button>
+        <button type="button" class="btn-ghost" id="btnSample">Load sample</button>
+        <button type="button" class="btn-ghost" id="btnClear">Clear</button>
+      </div>
+
+      <div class="status" id="status"></div>
+      <div class="tip-box"><strong>Tip:</strong> For email or keyword lists, enable blank + duplicate removal, trim-for-compare, and leave sort off to preserve first-seen order.</div>
+      <div class="note-box"><strong>Note:</strong> Processing stays in this tab. Large pastes (tens of thousands of lines) are fine in modern browsers; regex filters should stay simple for speed.</div>
+    </main>
+
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <h3>Quick presets</h3>
+        <ul class="sidebar-list">
+          <li>· Lists → blank + duplicates</li>
+          <li>· Logs → filter + blanks</li>
+          <li>· Keywords → dedupe + sort A–Z</li>
+          <li>· CSV column → trim + join</li>
+          <li>· Notes → collapse spaces</li>
+        </ul>
+      </div>
+      <div class="sidebar-card">
+        <h3>What gets removed</h3>
+        <table class="ref-table">
+          <tr><td>Empty lines</td><td>optional</td></tr>
+          <tr><td>Exact duplicates</td><td>optional</td></tr>
+          <tr><td>Whitespace twins</td><td>trim-cmp</td></tr>
+          <tr><td>Case twins</td><td>ignore case</td></tr>
+          <tr><td>Matched pattern</td><td>filter</td></tr>
+        </table>
+      </div>
+      <div class="sidebar-card">
+        <h3>Privacy</h3>
+        <ul class="sidebar-list">
+          <li>· No account required</li>
+          <li>· No server upload</li>
+          <li>· Copy or download locally</li>
+          <li>· Safe for private lists</li>
+        </ul>
+      </div>
+      <div class="ad-sidebar">
+        <script>atOptions={'key':'5b2625d96c11d7b599cea160717bc0f6','format':'iframe','height':250,'width':300,'params':{}};</script>
+        <script src="https://www.highperformanceformat.com/5b2625d96c11d7b599cea160717bc0f6/invoke.js"></script>
+      </div>
+    </aside>
   </div>
 
-  <!-- Footer -->
-  <footer>
-    &copy;2025 <a href="#">Noise Text Remover</a> &mdash; All rights reserved.
-    &nbsp;&middot;&nbsp; No data is stored or sent to any server. Everything runs in your browser.
-  </footer>
+  <section class="guide-grid">
+    <div class="guide-card">
+      <h2>How it works</h2>
+      <div class="steps">
+        <div class="step"><b>1</b><span>Paste or type multiline text into Input.</span></div>
+        <div class="step"><b>2</b><span>Toggle blank, duplicate, trim, filter &amp; sort rules.</span></div>
+        <div class="step"><b>3</b><span>Copy or download the cleaned Output.</span></div>
+      </div>
+    </div>
+    <div class="guide-card">
+      <h2>Best for</h2>
+      <ul>
+        <li>Email / username lists</li>
+        <li>SEO keyword exports</li>
+        <li>Log &amp; CSV column cleanup</li>
+        <li>Removing empty paste noise</li>
+        <li>Building comma-separated lists</li>
+      </ul>
+    </div>
+    <div class="guide-card">
+      <h2>Why on-device?</h2>
+      <ul>
+        <li>Same privacy model as modern web text tools</li>
+        <li>Instant feedback as you edit</li>
+        <li>Works offline after the page loads</li>
+        <li>No signup wall for basic cleanup</li>
+      </ul>
+    </div>
+  </section>
 
-  <!-- Toast notification -->
-  <div class="toast" id="toast"></div>
+  <div class="ad-mid">
+    <!-- 文中广告脚本（加了属性） -->
+    <script data-cfasync="false" src="https://adsterra-xxx2.js"></script>
+  </div>
 
-  <script>
-    /* ── Element refs ── */
-    const inputText   = document.getElementById('inputText');
-    const outputText  = document.getElementById('outputText');
-    const inCount     = document.getElementById('inCount');
-    const outCount    = document.getElementById('outCount');
-    const statIn      = document.getElementById('statIn');
-    const statOut     = document.getElementById('statOut');
-    const statRemoved = document.getElementById('statRemoved');
-    const statPct     = document.getElementById('statPct');
-    const statWords   = document.getElementById('statWords');
-    const toast       = document.getElementById('toast');
+  <div class="content-block">
+    <h2>Blank lines vs duplicate lines</h2>
+    <p>Blank-line removal deletes empty rows (and, here, whitespace-only rows). Duplicate removal keeps one occurrence of each repeated line — by default the <strong>first</strong>, or the <strong>last</strong> if you enable that option (useful for timestamped logs where the newest entry should win).</p>
+    <ul>
+      <li><strong>Trim for comparison</strong> treats <code>apple</code> and <code>&nbsp;apple&nbsp;</code> as the same duplicate without rewriting every line.</li>
+      <li><strong>Trim each line</strong> actually rewrites output by stripping leading/trailing spaces.</li>
+      <li><strong>Ignore case</strong> treats <code>Apple</code> and <code>apple</code> as duplicates, similar to advanced modes on Small Study Tools / Toolonic-style removers.</li>
+    </ul>
+  </div>
 
-    /* ── Option toggles ── */
-    const optEls = {
-      symbols:     document.getElementById('opt-symbols'),
-      extraSpaces: document.getElementById('opt-extra-spaces'),
-      zeroWidth:   document.getElementById('opt-zero-width'),
-      control:     document.getElementById('opt-control'),
-      numbers:     document.getElementById('opt-numbers'),
-    };
+  <div class="content-block">
+    <h2>Filter &amp; join tips</h2>
+    <ul>
+      <li>Use <strong>Contains</strong> to drop comment markers or junk tokens quickly.</li>
+      <li>Use <strong>Regex</strong> for patterns like <code>^#</code> (lines starting with #) or <code>\d{4}-\d{2}-\d{2}</code>.</li>
+      <li><strong>Invert filter</strong> keeps only matching lines — handy for extracting a subset.</li>
+      <li><strong>Join</strong> turns a cleaned column into a single comma/pipe/tab-separated string for spreadsheets or code arrays.</li>
+    </ul>
+  </div>
 
-    /* Toggle pill style on click (click fires before checkbox change, so flip manually) */
-    Object.values(optEls).forEach(el => {
-      el.addEventListener('click', () => {
-        const cb = el.querySelector('input');
-        cb.checked = !cb.checked;
-        el.classList.toggle('active', cb.checked);
-        clean();
-      });
-    });
+  <h2 class="sec-title">FAQ</h2>
+  <details>
+    <summary>Is my text uploaded to a server?</summary>
+    <p>No. All cleanup runs in your browser with JavaScript. Your lists never leave this tab — the same privacy idea used by modern duplicate-line removers.</p>
+  </details>
+  <details>
+    <summary>Does duplicate removal change line order?</summary>
+    <p>No, unless you choose a sort option. The tool keeps the first (or last) occurrence and preserves the relative order of remaining unique lines.</p>
+  </details>
+  <details>
+    <summary>Are empty lines always deleted?</summary>
+    <p>Only when “Remove blank / whitespace-only lines” is enabled. Turn it off if you need to keep paragraph spacing.</p>
+  </details>
+  <details>
+    <summary>What is “trim before duplicate comparison”?</summary>
+    <p>It compares lines after stripping leading/trailing spaces for matching purposes, but keeps the original spacing of the kept line unless you also enable “Trim each line”.</p>
+  </details>
+  <details>
+    <summary>Can I remove lines that contain a word?</summary>
+    <p>Yes. Set Filter mode to Contains (or Starts with / Ends with / Exact / Regex), enter the match text, and optionally invert to keep only matches.</p>
+  </details>
+  <details>
+    <summary>How do I get a comma-separated list?</summary>
+    <p>Clean blanks/duplicates first, then enable “Join remaining lines” and pick Comma + space (or another separator).</p>
+  </details>
+</div>
 
-    function getOpts() {
-      return Object.fromEntries(
-        Object.entries(optEls).map(([k, el]) => [k, el.querySelector('input').checked])
-      );
-    }
+<div class="container">
+  <div class="ad-bottom">
+    <script>atOptions={'key':'5a3667e1a909df26029e97d7d01cf2b5','format':'iframe','height':50,'width':320,'params':{}};</script>
+    <script src="https://www.highperformanceformat.com/5a3667e1a909df26029e97d7d01cf2b5/invoke.js"></script>
+    <!-- 底部广告脚本（加了属性） -->
+    <script data-cfasync="false" src="https://adsterra-xxx3.js"></script>
+  </div>
+</div>
 
-    /* ── Core cleaning function ── */
-    function cleanText(text, opts) {
-      let out = text;
+<div class="container">
+  <div class="more-tools">
+    <h2>More tools on QuickCalc Hub</h2>
+    <div class="links">
+      <a href="../ns-78/">Word Character Counter</a>
+      <a href="../ns-70/">HTML Beautifier</a>
+      <a href="../ns-80/">Favicon Maker Online</a>
+      <a href="../ns-79/">Shoe Size Converter</a>
+      <a href="../">All tools</a>
+    </div>
+  </div>
+</div>
 
-      /* 1. Zero-width & invisible Unicode (zero-width space, BOM, soft-hyphen, etc.) */
-      if (opts.zeroWidth) {
-        out = out.replace(/[\u200B-\u200D\uFEFF\u00AD\u2060\u180E\u034F\uFFA0]/g, '');
+<footer>
+  <div class="container">Text Line Remover — educational in-browser cleanup tool inspired by Line Cleanup &amp; duplicate-line removers. Always review output before using in production.</div>
+</footer>
+
+<script>
+(function(){
+  var byId=function(id){return document.getElementById(id);};
+  var input=byId('inputText');
+  var output=byId('outputText');
+  var statusEl=byId('status');
+  var timer=null;
+
+  var SAMPLE=[
+    'apple',
+    'banana',
+    '',
+    '  apple  ',
+    'Banana',
+    'cherry',
+    '   ',
+    'date',
+    'cherry',
+    '# skip me',
+    'elderberry',
+    'apple'
+  ].join('\n');
+
+  function setStatus(type,msg){
+    statusEl.className='status show '+type;
+    statusEl.textContent=msg;
+  }
+  function clearStatus(){statusEl.className='status';statusEl.textContent='';}
+
+  function splitLines(text){
+    if(!text)return [];
+    return text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n');
+  }
+
+  function isBlank(line){
+    return !line || !String(line).trim();
+  }
+
+  function normKey(line,ignoreCase,trimCmp){
+    var s=String(line);
+    if(trimCmp)s=s.trim();
+    if(ignoreCase)s=s.toLowerCase();
+    return s;
+  }
+
+  function getSep(){
+    var v=byId('optSep').value;
+    if(v==='\\t')return '\t';
+    return v;
+  }
+
+  function applyFilter(lines){
+    var mode=byId('filterMode').value;
+    if(mode==='off')return lines;
+    var raw=byId('filterVal').value;
+    /* Empty pattern must not wipe all lines ('' matches everywhere for contains/starts) */
+    if(mode!=='regex'&&raw==='')return lines;
+    var invert=byId('filterInvert').checked;
+    var re=null;
+    if(mode==='regex'){
+      if(!raw)return lines;
+      try{re=new RegExp(raw);}
+      catch(e){
+        setStatus('err','Invalid regular expression: '+(e&&e.message?e.message:'syntax error'));
+        return lines;
       }
+    }
+    return lines.filter(function(line){
+      var hit=false;
+      if(mode==='contains')hit=line.indexOf(raw)!==-1;
+      else if(mode==='starts')hit=line.indexOf(raw)===0;
+      else if(mode==='ends')hit=line.slice(-raw.length)===raw;
+      else if(mode==='exact')hit=line===raw;
+      else if(mode==='regex')hit=re.test(line);
+      return invert?hit:!hit;
+    });
+  }
 
-      /* 2. Control characters (keep \n newline and \t tab) */
-      if (opts.control) {
-        out = out.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, '');
-        /* Unicode replacement / block-element junk common in encoding errors */
-        out = out.replace(/[\uFFFD\u2588-\u2595]/g, '');
+  function clean(){
+    var lines=splitLines(input.value);
+    var inCount=input.value===''?0:lines.length;
+
+    var optBlank=byId('optBlank').checked;
+    var optDup=byId('optDup').checked;
+    var optTrim=byId('optTrim').checked;
+    var optSpaces=byId('optSpaces').checked;
+    var ignoreCase=byId('optIgnoreCase').checked;
+    var trimCmp=byId('optTrimCmp').checked;
+    var keepLast=byId('optKeepLast').checked;
+    var optJoin=byId('optJoin').checked;
+    var sort=byId('optSort').value;
+
+    var working=lines.slice();
+
+    if(optTrim){
+      working=working.map(function(l){return l.trim();});
+    }
+    if(optSpaces){
+      working=working.map(function(l){return l.replace(/[ \t\f\v]+/g,' ');});
+    }
+    if(optBlank){
+      working=working.filter(function(l){return !isBlank(l);});
+    }
+
+    if(optDup){
+      if(keepLast){
+        var seenLast=Object.create(null);
+        var rev=[];
+        for(var i=working.length-1;i>=0;i--){
+          var key=normKey(working[i],ignoreCase,trimCmp);
+          if(key in seenLast)continue;
+          seenLast[key]=1;
+          rev.push(working[i]);
+        }
+        working=rev.reverse();
+      }else{
+        var seen=Object.create(null);
+        var uniq=[];
+        for(var j=0;j<working.length;j++){
+          var k=normKey(working[j],ignoreCase,trimCmp);
+          if(k in seen)continue;
+          seen[k]=1;
+          uniq.push(working[j]);
+        }
+        working=uniq;
       }
-
-      /* 3. Special symbols — keep letters, digits (unless stripped), basic punctuation, whitespace */
-      if (opts.symbols) {
-        const keep = opts.numbers
-          ? /[^a-zA-Z\s.,!?;:'"()\-]/g
-          : /[^a-zA-Z0-9\s.,!?;:'"()\-]/g;
-        out = out.replace(keep, '');
-      } else if (opts.numbers) {
-        out = out.replace(/\d/g, '');
-      }
-
-      /* 4. Normalize whitespace: trim lines, collapse multiple spaces, limit blank lines */
-      if (opts.extraSpaces) {
-        out = out
-          .split('\n')
-          .map(line => line.replace(/[ \t]{2,}/g, ' ').trim())
-          .join('\n')
-          .replace(/\n{3,}/g, '\n\n')
-          .trim();
-      }
-
-      return out;
     }
 
-    /* ── Update stat counters ── */
-    function updateStats(raw, cleaned) {
-      const inLen   = raw.length;
-      const outLen  = cleaned.length;
-      const removed = Math.max(0, inLen - outLen);
-      const pct     = inLen > 0 ? Math.round((removed / inLen) * 100) : null;
-      const words   = cleaned.trim() === '' ? 0 : cleaned.trim().split(/\s+/).length;
+    working=applyFilter(working);
 
-      statIn.textContent      = inLen.toLocaleString();
-      statOut.textContent     = outLen.toLocaleString();
-      statRemoved.textContent = removed.toLocaleString();
-      statPct.textContent     = pct !== null ? pct + '%' : '-';
-      statWords.textContent   = words.toLocaleString();
-      inCount.textContent     = inLen  + ' chars';
-      outCount.textContent    = outLen + ' chars';
+    if(sort==='asc')working=working.slice().sort(function(a,b){return a.localeCompare(b);});
+    else if(sort==='desc')working=working.slice().sort(function(a,b){return b.localeCompare(a);});
+    else if(sort==='len-asc')working=working.slice().sort(function(a,b){return a.length-b.length||a.localeCompare(b);});
+    else if(sort==='len-desc')working=working.slice().sort(function(a,b){return b.length-a.length||a.localeCompare(b);});
+
+    var outText=optJoin?working.join(getSep()):working.join('\n');
+    output.value=outText;
+
+    var outCount=working.length;
+    byId('sIn').textContent=String(inCount);
+    byId('sOut').textContent=String(outCount);
+    byId('sRem').textContent=String(Math.max(0,inCount-outCount));
+    byId('sChars').textContent=String(outText.length);
+
+    return {inCount:inCount,outCount:outCount,text:outText};
+  }
+
+  function schedule(){
+    clearTimeout(timer);
+    timer=setTimeout(clean,120);
+  }
+
+  function downloadTxt(){
+    var t=output.value;
+    var blob=new Blob([t],{type:'text/plain;charset=utf-8'});
+    var a=document.createElement('a');
+    var url=URL.createObjectURL(blob);
+    a.href=url;a.download='cleaned-lines.txt';
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(url);},1500);
+    setStatus('ok','Download started.');
+  }
+
+  input.addEventListener('input',schedule);
+  [
+    'optBlank','optDup','optTrim','optSpaces','optIgnoreCase','optTrimCmp','optKeepLast','optJoin',
+    'optSort','optSep','filterMode','filterVal','filterInvert'
+  ].forEach(function(id){
+    var el=byId(id);
+    el.addEventListener(el.tagName==='SELECT'||el.type==='checkbox'?'change':'input',schedule);
+  });
+
+  byId('btnRun').addEventListener('click',function(){
+    var r=clean();
+    setStatus('ok','Cleaned: '+r.inCount+' → '+r.outCount+' lines ('+Math.max(0,r.inCount-r.outCount)+' removed).');
+  });
+  byId('btnCopy').addEventListener('click',function(){
+    clean();
+    var t=output.value;
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t).then(function(){setStatus('ok','Output copied to clipboard.');});
+    }else{
+      output.removeAttribute('readonly');output.select();document.execCommand('copy');output.setAttribute('readonly','');
+      setStatus('ok','Output copied to clipboard.');
     }
+  });
+  byId('btnDownload').addEventListener('click',function(){clean();downloadTxt();});
+  byId('btnSwap').addEventListener('click',function(){
+    clean();
+    input.value=output.value;
+    clean();
+    setStatus('info','Output moved to input. You can run another cleanup pass.');
+  });
+  byId('btnSample').addEventListener('click',function(){
+    input.value=SAMPLE;
+    byId('optBlank').checked=true;
+    byId('optDup').checked=true;
+    byId('optTrimCmp').checked=true;
+    byId('optIgnoreCase').checked=false;
+    byId('filterMode').value='contains';
+    byId('filterVal').value='#';
+    byId('filterInvert').checked=false;
+    clean();
+    setStatus('info','Sample loaded. Blank + duplicates on; lines containing “#” removed.');
+  });
+  byId('btnClear').addEventListener('click',function(){
+    input.value='';
+    output.value='';
+    byId('sIn').textContent='0';
+    byId('sOut').textContent='0';
+    byId('sRem').textContent='0';
+    byId('sChars').textContent='0';
+    clearStatus();
+  });
 
-    /* ── Run clean ── */
-    function clean() {
-      const raw     = inputText.value;
-      const result  = cleanText(raw, getOpts());
-      outputText.value = result;
-      updateStats(raw, result);
-    }
-
-    /* ── Toast helper ── */
-    let toastTimer;
-    function showToast(msg) {
-      toast.textContent = msg;
-      toast.classList.add('show');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
-    }
-
-    /* ── Button: Clean (manual) ── */
-    document.getElementById('btnClean').addEventListener('click', () => {
-      clean();
-      showToast('Text cleaned!');
-    });
-
-    /* ── Button: Copy result ── */
-    document.getElementById('btnCopy').addEventListener('click', () => {
-      if (!outputText.value) { showToast('Nothing to copy yet.'); return; }
-      navigator.clipboard.writeText(outputText.value)
-        .then(() => showToast('Copied to clipboard!'))
-        .catch(() => {
-          outputText.select();
-          document.execCommand('copy');
-          showToast('Copied!');
-        });
-    });
-
-    /* ── Button: Download .txt ── */
-    document.getElementById('btnDownload').addEventListener('click', () => {
-      if (!outputText.value) { showToast('Nothing to download yet.'); return; }
-      const blob = new Blob([outputText.value], { type: 'text/plain;charset=utf-8' });
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement('a');
-      a.href = url; a.download = 'cleaned-text.txt';
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('File downloaded!');
-    });
-
-    /* ── Button: Clear all ── */
-    document.getElementById('btnClear').addEventListener('click', () => {
-      inputText.value = ''; outputText.value = '';
-      updateStats('', '');
-      showToast('Cleared.');
-      inputText.focus();
-    });
-
-    /* ── Real-time: clean on every keystroke ── */
-    inputText.addEventListener('input', clean);
-
-    /* Init */
-    updateStats('', '');
-  </script>
+  clean();
+})();
+</script>
 </body>
 </html>
